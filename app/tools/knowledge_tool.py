@@ -1,5 +1,6 @@
 """知识检索工具 - 从向量数据库中检索相关信息"""
 
+import json
 from typing import List, Tuple
 
 from langchain_core.documents import Document
@@ -7,6 +8,7 @@ from langchain_core.tools import tool
 from loguru import logger
 
 from app.config import config
+from app.core.langfuse_client import langfuse_client
 from app.services.vector_store_manager import vector_store_manager
 
 
@@ -39,8 +41,12 @@ def retrieve_knowledge(query: str) -> Tuple[str, List[Document]]:
         
         # 格式化文档为上下文
         context = format_docs(docs)
-        
+
         logger.info(f"检索到 {len(docs)} 个相关文档")
+
+        # 记录检索详情到 Langfuse（用于评估召回效果）
+        _log_retrieval_to_langfuse(query, docs)
+
         return context, docs
         
     except Exception as e:
@@ -83,3 +89,40 @@ def format_docs(docs: List[Document]) -> str:
         formatted_parts.append(formatted)
     
     return "\n".join(formatted_parts)
+
+
+def _log_retrieval_to_langfuse(query: str, docs: List[Document]) -> None:
+    """将检索结果记录到 Langfuse，用于评估召回效果"""
+    client = langfuse_client.get_client()
+    if not client:
+        return
+
+    try:
+        trace = client.trace(
+            name="retrieval",
+            metadata={"query": query, "top_k": config.rag_top_k},
+        )
+
+        for i, doc in enumerate(docs):
+            source = doc.metadata.get("_source", "unknown")
+            file_name = doc.metadata.get("_file_name", "unknown")
+            h1 = doc.metadata.get("h1", "")
+            h2 = doc.metadata.get("h2", "")
+
+            trace.span(
+                name=f"chunk-{i}",
+                input=query,
+                output=doc.page_content,
+                metadata={
+                    "source": source,
+                    "file_name": file_name,
+                    "h1": h1,
+                    "h2": h2,
+                    "chunk_index": i,
+                    "chunk_length": len(doc.page_content),
+                },
+            )
+
+        trace.update()
+    except Exception as e:
+        logger.debug(f"Langfuse 检索记录失败（不影响主流程）: {e}")

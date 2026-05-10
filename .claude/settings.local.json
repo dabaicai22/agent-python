@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit *)",
+      "Bash(gh auth *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "PowerShell(Set-Content *)",
+      "Bash(.venv/Scripts/python.exe *)",
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"stop-windows.bat\"\\); if \\($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF\\) { \"BOM detected\" } else { \"No BOM\" })",
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"start-windows.bat\"\\); if \\($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF\\) { \"BOM detected\" } else { \"No BOM\" })",
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"stop-windows.bat\"\\); $first10 = $bytes[0..9] | ForEach-Object { \"0x{0:X2}\" -f $_ }; \"First 10 bytes: $first10\"; \"Length: $\\($bytes.Length\\)\")",
+      "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"start-windows.bat\"\\); $first10 = $bytes[0..9] | ForEach-Object { \"0x{0:X2}\" -f $_ }; \"First 10 bytes: $first10\"; \"Length: $first10\")",
+      "Bash(cd /d \"D:\\\\code\\\\super_biz_agent_py-release-2026-03-21\\\\super_biz_agent_py-release-2026-03-21\")",
+      "Bash(n\\\\\", \\\\\")",
+      "Bash(n\\\\\")",
+      "Bash(powershell -Command \"\\(Get-Content start-windows.bat -Raw\\) -replace \\\\\"`n\\\\\", \\\\\"`r`n\\\\\")",
+      "Bash(Set-Content start-windows.bat -NoNewline -Encoding ASCII\")",
+      "Bash(uv pip *)",
+      "PowerShell($content = [System.IO.File]::ReadAllText\\(\"D:\\\\code\\\\super_biz_agent_py-release-2026-03-21\\\\super_biz_agent_py-release-2026-03-21\\\\start-windows.bat\", [System.Text.Encoding]::UTF8\\); $content = $content -replace \"\\(?<!\\\\r\\)\\\\n\", \"`r`n\"; [System.IO.File]::WriteAllText\\(\"D:\\\\code\\\\super_biz_agent_py-release-2026-03-21\\\\super_biz_agent_py-release-2026-03-21\\\\start-windows.bat\", $content, [System.Text.UTF8Encoding]::new\\($false\\)\\))",
+      "PowerShell($content = [System.IO.File]::ReadAllText\\(\"D:\\\\code\\\\super_biz_agent_py-release-2026-03-21\\\\super_biz_agent_py-release-2026-03-21\\\\stop-windows.bat\", [System.Text.Encoding]::UTF8\\); $content = $content -replace \"\\(?<!\\\\r\\)\\\\n\", \"`r`n\"; [System.IO.File]::WriteAllText\\(\"D:\\\\code\\\\super_biz_agent_py-release-2026-03-21\\\\super_biz_agent_py-release-2026-03-21\\\\stop-windows.bat\", $content, [System.Text.UTF8Encoding]::new\\($false\\)\\))",
+      "Bash(curl -s http://localhost:9900/health)",
+      "Bash(curl *)"
+    ]
+  }
+}

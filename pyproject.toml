@@ -30,6 +30,8 @@ dependencies = [
     "langchain-mcp-adapters>=0.2.1",
     "fastmcp>=2.14.0",
     "langchain-qwq>=0.3.4",
+    "langfuse>=2.0.0",
+    "langfuse-langchain>=2.0.0",
 ]
 
 [project.optional-dependencies]

@@ -25,7 +25,7 @@ echo [2/6] 配置 Python 版本...
 if exist .python-version (
     set /p PYTHON_VERSION=<.python-version
     echo [信息] 当前配置版本: !PYTHON_VERSION!
-    
+
     REM 检查是否为 3.10（不兼容）
     echo !PYTHON_VERSION! | findstr /C:"3.10" >nul
     if not errorlevel 1 (
@@ -43,7 +43,7 @@ REM 创建或同步虚拟环境
 echo [3/6] 创建/同步虚拟环境...
 if exist .venv\Scripts\python.exe (
     echo [信息] 虚拟环境已存在，检查更新...
-    
+
     REM 如果有 uv，尝试使用 uv sync
     if "%USE_UV%"=="1" (
         uv sync 2>nul
@@ -59,7 +59,7 @@ if exist .venv\Scripts\python.exe (
     )
 ) else (
     echo [信息] 创建新的虚拟环境...
-    
+
     REM 如果有 uv，尝试使用 uv sync
     if "%USE_UV%"=="1" (
         echo [信息] 尝试使用 uv sync 创建...
@@ -70,7 +70,7 @@ if exist .venv\Scripts\python.exe (
         )
         echo [警告] uv sync 失败，回退到传统方式...
     )
-    
+
     REM 使用传统 Python venv 创建
     echo [信息] 使用 python -m venv 创建...
     python -m venv .venv
@@ -80,7 +80,7 @@ if exist .venv\Scripts\python.exe (
         pause
         exit /b 1
     )
-    
+
     REM 安装依赖
     echo [信息] 安装项目依赖（这可能需要几分钟）...
     .venv\Scripts\python.exe -m pip install --upgrade pip -q
@@ -148,7 +148,7 @@ if errorlevel 1 (
 ) else (
     echo [成功] FastAPI 服务运行正常
     echo.
-    
+
     REM 调用 API 上传 aiops-docs 文档到向量数据库
     echo [8/8] 上传文档到向量数据库...
     for %%f in (aiops-docs\*.md) do (

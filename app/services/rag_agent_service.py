@@ -20,6 +20,7 @@ from typing_extensions import TypedDict
 from langchain_qwq import ChatQwen
 
 from app.config import config
+from app.core.langfuse_client import langfuse_client
 from app.tools import get_current_time, retrieve_knowledge
 from app.agent.mcp_client import get_mcp_client_with_retry
 
@@ -206,6 +207,11 @@ class RagAgentService:
                 }
             }
 
+            # 接入 Langfuse 追踪（未配置时自动跳过）
+            handler = langfuse_client.get_callback_handler()
+            if handler:
+                config_dict["callbacks"] = [handler]
+
             result = await self.agent.ainvoke(
                 input=agent_input,
                 config=config_dict,
@@ -269,6 +275,11 @@ class RagAgentService:
                     "thread_id": session_id
                 }
             }
+
+            # 接入 Langfuse 追踪（未配置时自动跳过）
+            handler = langfuse_client.get_callback_handler()
+            if handler:
+                config_dict["callbacks"] = [handler]
 
             async for token, metadata in self.agent.astream(
                 input=agent_input,

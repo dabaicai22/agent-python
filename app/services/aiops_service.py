@@ -9,6 +9,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from loguru import logger
 
 from app.agent.aiops import PlanExecuteState, planner, executor, replanner
+from app.core.langfuse_client import langfuse_client
 
 
 # 节点名称常量
@@ -110,6 +111,11 @@ class AIOpsService:
                     "thread_id": session_id
                 }
             }
+
+            # 接入 Langfuse 追踪（未配置时自动跳过）
+            handler = langfuse_client.get_callback_handler()
+            if handler:
+                config_dict["callbacks"] = [handler]
 
             async for event in self.graph.astream(
                 input=initial_state,

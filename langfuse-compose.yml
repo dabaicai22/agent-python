@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: langfuse-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: langfuse
+    volumes:
+      - langfuse_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d langfuse"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  langfuse:
+    image: langfuse/langfuse:latest
+    container_name: langfuse-server
+    ports:
+      - "3000:3000"
+    environment:
+      # 数据库连接
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/langfuse
+      # 会话加密密钥（生产环境请换成随机强密码）
+      NEXTAUTH_SECRET: mysecret
+      # 数据加密盐（生产环境请换成随机值）
+      SALT: mysalt
+      # 可选：关闭用户注册（只让管理员添加用户）
+      # DISABLE_SIGNUP: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  langfuse_postgres_data:
