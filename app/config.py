@@ -48,6 +48,13 @@ class Settings(BaseSettings):
     mcp_monitor_transport: str = "streamable-http"
     mcp_monitor_url: str = "http://localhost:8004/mcp"
 
+    # Elasticsearch 配置
+    elasticsearch_host: str = "localhost"
+    elasticsearch_port: int = 9200
+    elasticsearch_index: str = "parent_docs"
+    elasticsearch_user: str = "elastic"
+    elasticsearch_password: str = "elastic123"
+
     # Langfuse 配置
     langfuse_host: str = "http://localhost:3000"
     langfuse_public_key: str = ""

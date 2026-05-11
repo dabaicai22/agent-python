@@ -7,6 +7,7 @@ from typing import Any, Dict, Optional
 from loguru import logger
 
 from app.services.document_splitter_service import document_splitter_service
+from app.services.elasticsearch_service import elasticsearch_service
 from app.services.vector_store_manager import vector_store_manager
 
 
@@ -130,7 +131,7 @@ class VectorIndexService:
 
     def index_single_file(self, file_path: str):
         """
-        索引单个文件 (使用新的 LangChain 分割器)
+        索引单个文件 (父子索引: 父文档存 ES, 子 chunks 存 Milvus)
 
         Args:
             file_path: 文件路径
@@ -151,20 +152,53 @@ class VectorIndexService:
             content = path.read_text(encoding="utf-8")
             logger.info(f"读取文件: {path}, 内容长度: {len(content)} 字符")
 
-            # 2. 删除该文件的旧数据（如果存在）
             normalized_path = path.as_posix()
+
+            # 2. 删除旧数据（从 ES 和 Milvus）
             vector_store_manager.delete_by_source(normalized_path)
+            elasticsearch_service.delete_by_file_path(normalized_path)
 
-            # 3. 使用新的文档分割器
-            documents = document_splitter_service.split_document(content, normalized_path)
-            logger.info(f"文档分割完成: {file_path} -> {len(documents)} 个分片")
+            # 3. 父子文档切分
+            split_result = document_splitter_service.split_document_with_parent(
+                content, normalized_path
+            )
 
-            # 4. 添加文档到向量存储
-            if documents:
-                vector_store_manager.add_documents(documents)
-                logger.info(f"文件索引完成: {file_path}, 共 {len(documents)} 个分片")
+            if not split_result:
+                logger.warning(f"文件内容为空或无法切分: {file_path}")
+                return
+
+            logger.info(
+                f"文档切分完成: {file_path} -> "
+                f"doc_id={split_result.doc_id}, 子chunk数={len(split_result.child_chunks)}"
+            )
+
+            # 4. 存储父文档到 ES
+            es_success = elasticsearch_service.index_parent_doc(
+                doc_id=split_result.doc_id,
+                title=split_result.title,
+                content=split_result.parent_content,
+                file_path=normalized_path,
+                level=split_result.level,
+                alarm_type=split_result.alarm_type,
+                metadata={
+                    "child_chunks_count": len(split_result.child_chunks),
+                },
+            )
+
+            if es_success:
+                logger.info(f"父文档索引到 ES: doc_id={split_result.doc_id}")
             else:
-                logger.warning(f"文件内容为空或无法分割: {file_path}")
+                logger.error(f"父文档索引到 ES 失败: doc_id={split_result.doc_id}")
+
+            # 5. 存储子 chunks 到 Milvus
+            if split_result.child_chunks:
+                vector_store_manager.add_documents(split_result.child_chunks)
+                logger.info(
+                    f"子 chunk 索引到 Milvus: doc_id={split_result.doc_id}, "
+                    f"chunk数={len(split_result.child_chunks)}"
+                )
+
+            logger.info(f"文件索引完成: {file_path}")
 
         except Exception as e:
             logger.error(f"索引文件失败: {file_path}, 错误: {e}")

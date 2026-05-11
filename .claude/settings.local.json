@@ -20,7 +20,9 @@
       "PowerShell($content = [System.IO.File]::ReadAllText\\(\"D:\\\\code\\\\super_biz_agent_py-release-2026-03-21\\\\super_biz_agent_py-release-2026-03-21\\\\start-windows.bat\", [System.Text.Encoding]::UTF8\\); $content = $content -replace \"\\(?<!\\\\r\\)\\\\n\", \"`r`n\"; [System.IO.File]::WriteAllText\\(\"D:\\\\code\\\\super_biz_agent_py-release-2026-03-21\\\\super_biz_agent_py-release-2026-03-21\\\\start-windows.bat\", $content, [System.Text.UTF8Encoding]::new\\($false\\)\\))",
       "PowerShell($content = [System.IO.File]::ReadAllText\\(\"D:\\\\code\\\\super_biz_agent_py-release-2026-03-21\\\\super_biz_agent_py-release-2026-03-21\\\\stop-windows.bat\", [System.Text.Encoding]::UTF8\\); $content = $content -replace \"\\(?<!\\\\r\\)\\\\n\", \"`r`n\"; [System.IO.File]::WriteAllText\\(\"D:\\\\code\\\\super_biz_agent_py-release-2026-03-21\\\\super_biz_agent_py-release-2026-03-21\\\\stop-windows.bat\", $content, [System.Text.UTF8Encoding]::new\\($false\\)\\))",
       "Bash(curl -s http://localhost:9900/health)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(.venv\\\\Scripts\\\\pip install *)",
+      "Bash(D:/code/super_biz_agent_py-release-2026-03-21/super_biz_agent_py-release-2026-03-21/.venv/Scripts/pip install *)"
     ]
   }
 }
